@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハーネス大衆化スライド — AIチーム運営マニュアル、ハーネス</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Kalam:wght@400;700&family=Shippori+Mincho:wght@500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background: #2a2520;
+  color: #5C5650;
+  font-family: var(--deck-font), 'Gaegu', 'Nanum Pen Script', sans-serif;
+  overflow: hidden;
+  height: 100%;
+}
+html[lang="en"] { --deck-font: 'Kalam', 'Gaegu', sans-serif; }
+html[lang="ja"] { --deck-font: 'Shippori Mincho', 'ヒラギノ角ゴシック W3', 'Gaegu', sans-serif; }
+html[lang="ko"] { --deck-font: 'Gaegu', 'Nanum Pen Script', sans-serif; }
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.deck {
+  position: relative;
+  width: 95vw;
+  max-width: 1600px;
+  aspect-ratio: 16 / 9;
+  background: #FFF8F0;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  overflow: hidden;
+  border-radius: 12px;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4% 5%;
+  display: none;
+  flex-direction: column;
+  background: #FFF8F0;
+}
+.slide.active { display: flex; }
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(184,176,168,0.05) 1px, transparent 1px),
+    radial-gradient(rgba(184,176,168,0.03) 1px, transparent 1px);
+  background-size: 24px 24px, 37px 37px;
+  background-position: 0 0, 12px 19px;
+  pointer-events: none;
+}
+.slide-content {
+  position: relative;
+  display: flex;
+  gap: 3%;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.slide-layout-center { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.slide-layout-image-text { flex-direction: row; align-items: center; }
+.slide-layout-text-image { flex-direction: row-reverse; align-items: center; }
+.slide-layout-full-image { flex-direction: column; align-items: center; justify-content: center; }
+.illustration { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.illustration img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgba(184,176,168,0.3));
+}
+.slide-layout-full-image .illustration { flex: none; width: 80%; height: 70%; }
+.text-area { flex: 1; padding: 0 2%; display: flex; flex-direction: column; justify-content: center; }
+.text-area.center { text-align: center; align-items: center; }
+h1 { font-size: 3.6rem; color: #5C5650; margin-bottom: 1rem; line-height: 1.2; }
+h1 .mustard {
+  background: linear-gradient(to bottom, transparent 62%, #F2C94C 62%, #F2C94C 92%, transparent 92%);
+  padding: 0 6px;
+}
+h1 .coral { color: #F4A39C; }
+.subtitle { font-size: 1.8rem; color: #8A7F75; margin-bottom: 1.2rem; }
+.message {
+  font-size: 1.6rem;
+  color: #6B8962;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(168,197,160,0.18);
+  border-left: 5px solid #A8C5A0;
+  border-radius: 6px;
+}
+ul.bullets { list-style: none; padding: 0; margin: 0; }
+ul.bullets li {
+  font-size: 1.6rem;
+  color: #5C5650;
+  padding: 0.5rem 0 0.5rem 2.4rem;
+  position: relative;
+  line-height: 1.5;
+}
+ul.bullets li::before {
+  content: "✦";
+  position: absolute;
+  left: 0.5rem;
+  color: #F2C94C;
+  font-size: 1.8rem;
+}
+.slide-layout-center h1 { font-size: 4.8rem; }
+.slide-layout-center .subtitle { font-size: 2rem; }
+.slide-meta {
+  position: absolute;
+  bottom: 1.5%;
+  right: 2%;
+  font-size: 1rem;
+  color: #B8B0A8;
+  z-index: 2;
+}
+.slide-num {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  font-size: 1.1rem;
+  color: #B8B0A8;
+  padding: 4px 12px;
+  border: 1.5px dashed #B8B0A8;
+  border-radius: 20px;
+  z-index: 2;
+}
+.controls {
+  position: fixed;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 16px;
+  border-radius: 30px;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  color: #fff;
+  font-size: 0.95rem;
+}
+.controls button {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.controls button:hover { background: rgba(255,255,255,0.25); }
+.counter { align-self: center; padding: 0 8px; }
+.help {
+  position: fixed;
+  bottom: 2vh;
+  right: 2vw;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.9rem;
+  z-index: 100;
+}
+.lang-switcher {
+  position: fixed;
+  top: 2vh;
+  right: 2vw;
+  display: flex;
+  gap: 6px;
+  background: rgba(0,0,0,0.3);
+  padding: 6px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  font-size: 0.9rem;
+}
+.lang-switcher a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  padding: 3px 10px;
+  border-radius: 14px;
+  transition: all 0.15s;
+}
+.lang-switcher a:hover { color: #fff; background: rgba(255,255,255,0.15); }
+.lang-switcher a.active {
+  color: #2a2520;
+  background: #F2C94C;
+  font-weight: 700;
+}
+.speaker-notes { display: none; }
+body.notes-visible .speaker-notes {
+  display: block;
+  position: fixed;
+  bottom: 8vh;
+  left: 2vw;
+  width: 30vw;
+  max-height: 40vh;
+  overflow: auto;
+  background: rgba(255,253,247,0.95);
+  border: 2px solid #A8C5A0;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 0.95rem;
+  color: #5C5650;
+  line-height: 1.5;
+  z-index: 99;
+}
+.speaker-notes h4 { color: #6B8962; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="lang-switcher"><a href="index.html" class="">한국어</a><a href="index_EN.html" class="">English</a><a href="index_JA.html" class="active">日本語</a></div>
+<div class="deck" id="deck">
+
+  <section class="slide active" data-notes="こんにちは。今日は約10分間、「ハーネス」という概念についてお話しします。このプレゼンの目標は、ハーネスが何かを概念的に理解すること。コーディングや実習の場ではありません。レシピを読む時間です。">
+    <span class="slide-num">1 / 10</span>
+    <div class="slide-content slide-layout-center">
+      <div class="illustration" style="height: 55%;">
+        <img src="_workspace/visual/images/slide_01.png" alt="表紙イラスト">
+      </div>
+      <div class="text-area center" style="flex: none; margin-top: 2rem;">
+        <h1>AIチーム<span class="mustard">運営マニュアル</span>、ハーネス</h1>
+        <p class="subtitle">みんなが理解できるハーネスエンジニアリング</p>
+        <p style="color:#B8B0A8; font-size:1.2rem;">2026-04-16 · ファン・ミンホ (revfactory@gmail.com)</p>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 1/10</div>
+  </section>
+
+  <section class="slide" data-notes="AIチャットボットに一度に大量の仕事を頼むと、ごちゃごちゃになります。AIがバカなのではなく、私たちも一人でコース料理を作れないのと同じです。だから複数のシェフ、複数の役割が必要なのです。">
+    <span class="slide-num">2 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_02.png" alt="フックイラスト"></div>
+      <div class="text-area">
+        <h1>AI 1台に<span class="coral">全部任せたら</span>？</h1>
+        <p class="message">一人でコース料理を全部作ると、手が回らなくなります。</p>
+        <ul class="bullets">
+          <li>「企画書をチェックして、修正して、レポートも作って」</li>
+          <li>結果は？ ごちゃごちゃ</li>
+          <li>私たちも一人でコース料理は作りません</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 2/10</div>
+  </section>
+
+  <section class="slide" data-notes="AIは「1台使う時代」から「チームで紡ぐ時代」へ変わっているのに、私たちの概念はまだチャットボット1台に止まっています。このギャップが広がると過信や不信が生まれます。作らなくても、読めるようにはなっておきたい。">
+    <span class="slide-num">3 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_03.png" alt="問題定義イラスト"></div>
+      <div class="text-area">
+        <h1>なぜ今<span class="mustard">ハーネスを理解</span>することが必要か</h1>
+        <p class="message">AIはチームで紡ぐ時代なのに、私たちの概念はまだチャットボット1台に止まっている。</p>
+        <ul class="bullets">
+          <li>AIは「1台使う時代」から「チームで紡ぐ時代」へ変化</li>
+          <li>作らなくても、読めるようにはなっておきたい</li>
+          <li>理解は基礎リテラシー — コーディング不要</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 3/10</div>
+  </section>
+
+  <section class="slide" data-notes="怒鳴るキッチンではなく、「この味つけどう？」とコメントし合うチームキッチンです。各シェフに役割があり、ヘッドシェフが調整します。これを毎日回す運営マニュアルがハーネスです。">
+    <span class="slide-num">4 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_04.png" alt="チームキッチンイラスト"></div>
+      <div class="text-area">
+        <h1>怒鳴るキッチンではなく、<span class="mustard">協力する</span>チームキッチン</h1>
+        <p class="message">ハーネスは、AIチームに役割を振り分ける、私たちが作るキッチン運営マニュアルです。</p>
+        <ul class="bullets">
+          <li>これは独裁キッチンではありません</li>
+          <li>「この味つけどう？」とコメントし合うチーム</li>
+          <li>このキッチンの運営マニュアル = ハーネス</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 4/10</div>
+  </section>
+
+  <section class="slide" data-notes="各役割をAI用語につなげます。エージェント=AIシェフ、オーケストレーター=ヘッドシェフ、スキル=レシピカード、ハーネス=運営マニュアル。ハーネスは売買する製品ではなく、私たちが作る設計方法です。">
+    <span class="slide-num">5 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_05.png" alt="概念マッピングイラスト"></div>
+      <div class="text-area">
+        <h1>キッチンの役割 = <span class="coral">AIの役割</span></h1>
+        <p class="message">エージェント・オーケストレーター・スキル・ハーネスが、それぞれどのキッチン役割か分かる。</p>
+        <ul class="bullets">
+          <li>エージェント = AIシェフ (役割を持ったAI)</li>
+          <li>オーケストレーター = ヘッドシェフ (調整役)</li>
+          <li>スキル = レシピカード / ハーネス = 運営マニュアル</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 5/10</div>
+  </section>
+
+  <section class="slide" data-notes="ハーネスの理解は3段階に分かれます。入門1~10分：1文で言える。中級30分：流れ図が書ける。上級60~90分：10分間他人に説明できる。最初の段階で止まっても大丈夫です。">
+    <span class="slide-num">6 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_06.png" alt="学習パスイラスト"></div>
+      <div class="text-area">
+        <h1><span class="mustard">3分</span>で感覚、<span class="mustard">30分</span>で絵、<span class="mustard">1時間</span>で説明</h1>
+        <p class="message">3段階の学習パスで、誰でも自分のペースで理解できる。</p>
+        <ul class="bullets">
+          <li>入門 (1~10分)：ハーネスを1文で言える</li>
+          <li>中級 (30分)：5つの要素の流れ図を書ける</li>
+          <li>上級 (60~90分)：他人に10分間説明できる</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 6/10</div>
+  </section>
+
+  <section class="slide" data-notes="最もよくある5つの誤解を正します。1) ハーネスは製品ではなく設計方法。2) AIは自分で判断するのではなく、設計範囲内で選ぶ。3) 人なしで動くのではなく、人が作って直す。4) 一度学んだら記憶するのではなく、毎回記憶を失う。5) コーディングを知らなくても理解できる。">
+    <span class="slide-num">7 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_07.png" alt="誤解イラスト"></div>
+      <div class="text-area">
+        <h1>これは<span class="coral">違います</span> — よくある5つの誤解</h1>
+        <p class="message">最もよくある5つの誤解を先に正します。</p>
+        <ul class="bullets">
+          <li>✗「AI製品だ」→ ✓ 設計方法だ</li>
+          <li>✗「AIが自分で判断」→ ✓ 設計された範囲内で選ぶ</li>
+          <li>✗「人なしで動く」→ ✓ 人が作って人が直す</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 7/10</div>
+  </section>
+
+  <section class="slide" data-notes="キムジャン、引っ越し、ピクニック。日常にもハーネス的な構造があります。役割を分けて、誰かが調整して、マニュアルがある瞬間です。あなたの日常でも、そんな瞬間を一つ探してみてください。">
+    <span class="slide-num">8 / 10</span>
+    <div class="slide-content slide-layout-full-image">
+      <div class="text-area center" style="flex: none; margin-bottom: 1rem;">
+        <h1>日常に見つける<span class="mustard">ハーネス的瞬間</span></h1>
+        <p class="message">自分の日常の中で、ハーネス的瞬間を見つけることができる。</p>
+      </div>
+      <div class="illustration"><img src="_workspace/visual/images/slide_08.png" alt="日常シーン"></div>
+      <div class="text-area center" style="flex: none; margin-top: 1rem;">
+        <ul class="bullets" style="display:flex; gap:2rem; justify-content:center; flex-wrap:wrap;">
+          <li>キムジャン：塩漬け・ヤンニョム・具 — 役割分担</li>
+          <li>引っ越し：梱包・運搬・配置 — 調整役</li>
+          <li>ピクニック：買出し・料理・席 — チェックリスト</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 8/10</div>
+  </section>
+
+  <section class="slide" data-notes="3つの文で要約します。1) ハーネスはAIチームの運営マニュアル — 製品ではなく設計方法。2) 人が作り、AIが実行する — 主語は常に「私たち」。3) AIシェフは毎回記憶を失う — だからメモリ設計が必要。">
+    <span class="slide-num">9 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_09.png" alt="要点整理イラスト"></div>
+      <div class="text-area">
+        <h1><span class="mustard">3つの文</span>で覚えましょう</h1>
+        <p class="message">ハーネスの本質を3つの文と自己チェックで固める。</p>
+        <ul class="bullets">
+          <li>ハーネスはAIチームの運営マニュアル — 製品ではなく設計方法</li>
+          <li>人が作り、AIが実行する — 主語は常に「私たち」</li>
+          <li>AIシェフは毎回記憶を失う — だからメモリ設計が必要</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 9/10</div>
+  </section>
+
+  <section class="slide" data-notes="理解だけで十分です。今日10分ご一緒しただけで、入門目標は達成です。もっと知りたい方は中級30分、上級90分のパスが用意されています。理解することと作ることは別の能力です。ありがとうございました。">
+    <span class="slide-num">10 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_10.png" alt="次のステップイラスト"></div>
+      <div class="text-area">
+        <h1>もっと<span class="coral">知りたければ</span></h1>
+        <p class="message">理解のその先に、道が開かれている。</p>
+        <ul class="bullets">
+          <li>理解だけで十分 — 今日ここまでで入門完了</li>
+          <li>中級30分・上級90分のパスを準備</li>
+          <li>作るのは別パス — 理解と作るは別の能力</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">ハーネス大衆化 · スライド 10/10 · ありがとうございました</div>
+  </section>
+
+</div>
+
+<div class="speaker-notes">
+  <h4>発表者ノート</h4>
+  <p id="noteContent"></p>
+</div>
+
+<div class="controls">
+  <button id="prevBtn">← 前へ</button>
+  <span class="counter"><span id="curNum">1</span> / 10</span>
+  <button id="nextBtn">次へ →</button>
+  <button id="notesBtn">ノート</button>
+</div>
+
+<div class="help">←/→ または Space · N: ノート · F: 全画面</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let currentIndex = 0;
+const curNum = document.getElementById('curNum');
+const noteContent = document.getElementById('noteContent');
+
+function show(idx) {
+  slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+  curNum.textContent = idx + 1;
+  noteContent.textContent = slides[idx].getAttribute('data-notes') || '';
+  currentIndex = idx;
+  history.replaceState(null, '', '#slide-' + (idx + 1));
+}
+
+function next() { if (currentIndex < slides.length - 1) show(currentIndex + 1); }
+function prev() { if (currentIndex > 0) show(currentIndex - 1); }
+
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('prevBtn').addEventListener('click', prev);
+document.getElementById('notesBtn').addEventListener('click', () => {
+  document.body.classList.toggle('notes-visible');
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { next(); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); e.preventDefault(); }
+  else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1);
+  else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('notes-visible');
+  else if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+const m = location.hash.match(/#slide-(\d+)/);
+if (m) { const i = parseInt(m[1]) - 1; if (i >= 0 && i < slides.length) show(i); }
+else show(0);
+</script>
+</body>
+</html>

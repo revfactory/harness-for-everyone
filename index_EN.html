@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harness for Everyone — AI Team Operating Manual</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Kalam:wght@400;700&family=Shippori+Mincho:wght@500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background: #2a2520;
+  color: #5C5650;
+  font-family: var(--deck-font), 'Gaegu', 'Nanum Pen Script', sans-serif;
+  overflow: hidden;
+  height: 100%;
+}
+html[lang="en"] { --deck-font: 'Kalam', 'Gaegu', sans-serif; }
+html[lang="ja"] { --deck-font: 'Shippori Mincho', 'ヒラギノ角ゴシック W3', 'Gaegu', sans-serif; }
+html[lang="ko"] { --deck-font: 'Gaegu', 'Nanum Pen Script', sans-serif; }
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.deck {
+  position: relative;
+  width: 95vw;
+  max-width: 1600px;
+  aspect-ratio: 16 / 9;
+  background: #FFF8F0;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  overflow: hidden;
+  border-radius: 12px;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4% 5%;
+  display: none;
+  flex-direction: column;
+  background: #FFF8F0;
+}
+.slide.active { display: flex; }
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(184,176,168,0.05) 1px, transparent 1px),
+    radial-gradient(rgba(184,176,168,0.03) 1px, transparent 1px);
+  background-size: 24px 24px, 37px 37px;
+  background-position: 0 0, 12px 19px;
+  pointer-events: none;
+}
+.slide-content {
+  position: relative;
+  display: flex;
+  gap: 3%;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.slide-layout-center { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.slide-layout-image-text { flex-direction: row; align-items: center; }
+.slide-layout-text-image { flex-direction: row-reverse; align-items: center; }
+.slide-layout-full-image { flex-direction: column; align-items: center; justify-content: center; }
+.illustration { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.illustration img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgba(184,176,168,0.3));
+}
+.slide-layout-full-image .illustration { flex: none; width: 80%; height: 70%; }
+.text-area { flex: 1; padding: 0 2%; display: flex; flex-direction: column; justify-content: center; }
+.text-area.center { text-align: center; align-items: center; }
+h1 { font-size: 3.6rem; color: #5C5650; margin-bottom: 1rem; line-height: 1.2; }
+h1 .mustard {
+  background: linear-gradient(to bottom, transparent 62%, #F2C94C 62%, #F2C94C 92%, transparent 92%);
+  padding: 0 6px;
+}
+h1 .coral { color: #F4A39C; }
+.subtitle { font-size: 1.8rem; color: #8A7F75; margin-bottom: 1.2rem; }
+.message {
+  font-size: 1.6rem;
+  color: #6B8962;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(168,197,160,0.18);
+  border-left: 5px solid #A8C5A0;
+  border-radius: 6px;
+}
+ul.bullets { list-style: none; padding: 0; margin: 0; }
+ul.bullets li {
+  font-size: 1.6rem;
+  color: #5C5650;
+  padding: 0.5rem 0 0.5rem 2.4rem;
+  position: relative;
+  line-height: 1.5;
+}
+ul.bullets li::before {
+  content: "✦";
+  position: absolute;
+  left: 0.5rem;
+  color: #F2C94C;
+  font-size: 1.8rem;
+}
+.slide-layout-center h1 { font-size: 4.8rem; }
+.slide-layout-center .subtitle { font-size: 2rem; }
+.slide-meta {
+  position: absolute;
+  bottom: 1.5%;
+  right: 2%;
+  font-size: 1rem;
+  color: #B8B0A8;
+  z-index: 2;
+}
+.slide-num {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  font-size: 1.1rem;
+  color: #B8B0A8;
+  padding: 4px 12px;
+  border: 1.5px dashed #B8B0A8;
+  border-radius: 20px;
+  z-index: 2;
+}
+.controls {
+  position: fixed;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 16px;
+  border-radius: 30px;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  color: #fff;
+  font-size: 0.95rem;
+}
+.controls button {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.controls button:hover { background: rgba(255,255,255,0.25); }
+.counter { align-self: center; padding: 0 8px; }
+.help {
+  position: fixed;
+  bottom: 2vh;
+  right: 2vw;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.9rem;
+  z-index: 100;
+}
+.lang-switcher {
+  position: fixed;
+  top: 2vh;
+  right: 2vw;
+  display: flex;
+  gap: 6px;
+  background: rgba(0,0,0,0.3);
+  padding: 6px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  font-size: 0.9rem;
+}
+.lang-switcher a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  padding: 3px 10px;
+  border-radius: 14px;
+  transition: all 0.15s;
+}
+.lang-switcher a:hover { color: #fff; background: rgba(255,255,255,0.15); }
+.lang-switcher a.active {
+  color: #2a2520;
+  background: #F2C94C;
+  font-weight: 700;
+}
+.speaker-notes { display: none; }
+body.notes-visible .speaker-notes {
+  display: block;
+  position: fixed;
+  bottom: 8vh;
+  left: 2vw;
+  width: 30vw;
+  max-height: 40vh;
+  overflow: auto;
+  background: rgba(255,253,247,0.95);
+  border: 2px solid #A8C5A0;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 0.95rem;
+  color: #5C5650;
+  line-height: 1.5;
+  z-index: 99;
+}
+.speaker-notes h4 { color: #6B8962; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="lang-switcher"><a href="index.html" class="">한국어</a><a href="index_EN.html" class="active">English</a><a href="index_JA.html" class="">日本語</a></div>
+<div class="deck" id="deck">
+
+  <section class="slide active" data-notes="Hello. For about 10 minutes today, we&#x27;ll talk about the concept of &#x27;Harness.&#x27; The goal isn&#x27;t to learn coding — it&#x27;s to understand what a Harness is, conceptually. Today is about reading the recipe, not becoming the chef.">
+    <span class="slide-num">1 / 10</span>
+    <div class="slide-content slide-layout-center">
+      <div class="illustration" style="height: 55%;">
+        <img src="_workspace/visual/images/slide_01.png" alt="Cover illustration">
+      </div>
+      <div class="text-area center" style="flex: none; margin-top: 2rem;">
+        <h1>AI Team <span class="mustard">Operating Manual</span>: Harness</h1>
+        <p class="subtitle">Harness Engineering for Everyone</p>
+        <p style="color:#B8B0A8; font-size:1.2rem;">2026-04-16 · Minho Hwang (revfactory@gmail.com)</p>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 1/10</div>
+  </section>
+
+  <section class="slide" data-notes="Hand a chatbot too many things at once and it gets jumbled — not because AI is stupid, but because even we don&#x27;t plate a full course alone. That&#x27;s why multiple chefs, multiple roles, are needed.">
+    <span class="slide-num">2 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_02.png" alt="Hook illustration"></div>
+      <div class="text-area">
+        <h1>What if one AI <span class="coral">does it all</span>?</h1>
+        <p class="message">A lone chef trying to plate a full course will flounder.</p>
+        <ul class="bullets">
+          <li>&quot;Review the proposal, revise it, and write the report too.&quot;</li>
+          <li>The result? A jumbled mess.</li>
+          <li>We don&#x27;t cook a full course alone, either.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 2/10</div>
+  </section>
+
+  <section class="slide" data-notes="AI is shifting from &#x27;using one&#x27; to &#x27;weaving a team,&#x27; but our mental model still stops at one chatbot. When that gap widens, we get overconfidence and mistrust. You don&#x27;t have to build Harnesses — but you should be able to read them.">
+    <span class="slide-num">3 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_03.png" alt="Problem illustration"></div>
+      <div class="text-area">
+        <h1>Why <span class="mustard">understanding Harness</span> matters now</h1>
+        <p class="message">AI is becoming a team, but our vocabulary is still stuck on &quot;just one chatbot.&quot;</p>
+        <ul class="bullets">
+          <li>AI is shifting from &quot;using one&quot; to &quot;weaving a team&quot;</li>
+          <li>Even if you don&#x27;t build one, you should be able to read one</li>
+          <li>Understanding is basic literacy — no coding required</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 3/10</div>
+  </section>
+
+  <section class="slide" data-notes="Not a kitchen of shouting orders, but a team kitchen where chefs comment &#x27;how&#x27;s the seasoning?&#x27; Each chef has a role; the head chef coordinates. The operating manual that keeps it running day after day — that&#x27;s Harness.">
+    <span class="slide-num">4 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_04.png" alt="Team kitchen illustration"></div>
+      <div class="text-area">
+        <h1>Not a dictatorial kitchen — a <span class="mustard">collaborative</span> team kitchen</h1>
+        <p class="message">Harness is the kitchen operating manual we write to divide roles among AI chefs.</p>
+        <ul class="bullets">
+          <li>This isn&#x27;t a dictatorial kitchen</li>
+          <li>Chefs say &quot;how&#x27;s the seasoning?&quot; to each other</li>
+          <li>This kitchen&#x27;s operating manual = Harness</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 4/10</div>
+  </section>
+
+  <section class="slide" data-notes="Now we map each role to its AI term. Agent = AI chef. Orchestrator = head chef. Skill = recipe card. Harness = operating manual. A Harness isn&#x27;t a product you buy — it&#x27;s a design we craft.">
+    <span class="slide-num">5 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_05.png" alt="Concept mapping illustration"></div>
+      <div class="text-area">
+        <h1>Kitchen roles = <span class="coral">AI roles</span></h1>
+        <p class="message">Know which kitchen role each term — Agent, Orchestrator, Skill, Harness — maps to.</p>
+        <ul class="bullets">
+          <li>Agent = AI chef (an AI with a role)</li>
+          <li>Orchestrator = head chef (coordinator)</li>
+          <li>Skill = recipe card / Harness = operating manual</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 5/10</div>
+  </section>
+
+  <section class="slide" data-notes="Understanding Harness has three stages. Beginner (1–10 min): one sentence. Intermediate (30 min): draw the flow. Advanced (60–90 min): explain for 10 minutes. Stopping at stage one is perfectly fine.">
+    <span class="slide-num">6 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_06.png" alt="Learning path illustration"></div>
+      <div class="text-area">
+        <h1><span class="mustard">3 min</span> for a feel, <span class="mustard">30 min</span> for the picture, <span class="mustard">1 hour</span> to explain</h1>
+        <p class="message">A three-stage path — anyone can grasp it at their own pace.</p>
+        <ul class="bullets">
+          <li>Beginner (1–10 min): Say Harness in one sentence</li>
+          <li>Intermediate (30 min): Draw the flow of five parts</li>
+          <li>Advanced (60–90 min): Explain it to someone for 10 min</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 6/10</div>
+  </section>
+
+  <section class="slide" data-notes="Five common misunderstandings. 1) Harness isn&#x27;t a product — it&#x27;s a design. 2) AI doesn&#x27;t decide on its own — it picks within a scope. 3) It doesn&#x27;t run without humans — we write and maintain it. 4) It doesn&#x27;t learn permanently — it forgets each session. 5) No coding needed to understand it.">
+    <span class="slide-num">7 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_07.png" alt="Misconceptions illustration"></div>
+      <div class="text-area">
+        <h1>Not this — <span class="coral">5 common myths</span></h1>
+        <p class="message">Clear up the five most common misconceptions up front.</p>
+        <ul class="bullets">
+          <li>✗ &quot;It&#x27;s an AI product&quot; → ✓ It&#x27;s a design approach</li>
+          <li>✗ &quot;AI decides on its own&quot; → ✓ It chooses within a designed scope</li>
+          <li>✗ &quot;It runs without humans&quot; → ✓ Humans write and fix it</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 7/10</div>
+  </section>
+
+  <section class="slide" data-notes="Kimjang, moving, a picnic — everyday life already has harness-like structures. Dividing roles, coordinating, following a plan. Try to find a moment like that in your own week.">
+    <span class="slide-num">8 / 10</span>
+    <div class="slide-content slide-layout-full-image">
+      <div class="text-area center" style="flex: none; margin-bottom: 1rem;">
+        <h1><span class="mustard">Harness moments</span> in everyday life</h1>
+        <p class="message">You can spot a harness-like moment in your own everyday life.</p>
+      </div>
+      <div class="illustration"><img src="_workspace/visual/images/slide_08.png" alt="Daily life scene"></div>
+      <div class="text-area center" style="flex: none; margin-top: 1rem;">
+        <ul class="bullets" style="display:flex; gap:2rem; justify-content:center; flex-wrap:wrap;">
+          <li>Kimjang: salting · seasoning · stuffing — role split</li>
+          <li>Moving: packing · carrying · placing — coordinator</li>
+          <li>Picnic: shopping · cooking · seating — checklist</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 8/10</div>
+  </section>
+
+  <section class="slide" data-notes="Three sentences to carry away. 1) Harness is the AI team operating manual — not a product, but a design. 2) Humans write, AI runs — the subject is always &#x27;we.&#x27; 3) AI chefs forget each time — which is why memory design matters.">
+    <span class="slide-num">9 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_09.png" alt="Key summary illustration"></div>
+      <div class="text-area">
+        <h1>Remember it in <span class="mustard">three sentences</span></h1>
+        <p class="message">Lock in the essence of Harness with three sentences and a self-check.</p>
+        <ul class="bullets">
+          <li>Harness is the AI team operating manual — not a product, a design</li>
+          <li>Humans write, AI runs — the subject is always &quot;we&quot;</li>
+          <li>AI chefs forget each time — so memory design matters</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 9/10</div>
+  </section>
+
+  <section class="slide" data-notes="Understanding alone is enough. If you stayed 10 minutes with us, the beginner goal is done. Want more? 30-minute intermediate and 90-minute advanced paths await. Understanding and building are different skills. Thank you.">
+    <span class="slide-num">10 / 10</span>
+    <div class="slide-content slide-layout-image-text">
+      <div class="illustration"><img src="_workspace/visual/images/slide_10.png" alt="Next steps illustration"></div>
+      <div class="text-area">
+        <h1>If you want to <span class="coral">go further</span></h1>
+        <p class="message">A path opens beyond understanding.</p>
+        <ul class="bullets">
+          <li>Understanding is enough — today completes the beginner goal</li>
+          <li>Intermediate (30 min) and advanced (90 min) paths are ready</li>
+          <li>Building is a separate track — different skill from understanding</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-meta">Harness for Everyone · Slide 10/10 · Thank you</div>
+  </section>
+
+</div>
+
+<div class="speaker-notes">
+  <h4>Speaker Notes</h4>
+  <p id="noteContent"></p>
+</div>
+
+<div class="controls">
+  <button id="prevBtn">← Prev</button>
+  <span class="counter"><span id="curNum">1</span> / 10</span>
+  <button id="nextBtn">Next →</button>
+  <button id="notesBtn">Notes</button>
+</div>
+
+<div class="help">←/→ or Space · N: Notes · F: Fullscreen</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let currentIndex = 0;
+const curNum = document.getElementById('curNum');
+const noteContent = document.getElementById('noteContent');
+
+function show(idx) {
+  slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+  curNum.textContent = idx + 1;
+  noteContent.textContent = slides[idx].getAttribute('data-notes') || '';
+  currentIndex = idx;
+  history.replaceState(null, '', '#slide-' + (idx + 1));
+}
+
+function next() { if (currentIndex < slides.length - 1) show(currentIndex + 1); }
+function prev() { if (currentIndex > 0) show(currentIndex - 1); }
+
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('prevBtn').addEventListener('click', prev);
+document.getElementById('notesBtn').addEventListener('click', () => {
+  document.body.classList.toggle('notes-visible');
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { next(); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); e.preventDefault(); }
+  else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1);
+  else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('notes-visible');
+  else if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+const m = location.hash.match(/#slide-(\d+)/);
+if (m) { const i = parseInt(m[1]) - 1; if (i >= 0 && i < slides.length) show(i); }
+else show(0);
+</script>
+</body>
+</html>

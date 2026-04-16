@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>만화로 이해하는 하네스 — 일반인을 위한 하네스 대중화 시리즈</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #FFF8F0;
+    color: #5C5650;
+    font-family: 'Gaegu', 'Nanum Pen Script', sans-serif;
+    line-height: 1.7;
+    min-height: 100%;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(rgba(184,176,168,0.06) 1px, transparent 1px),
+      radial-gradient(rgba(184,176,168,0.04) 1px, transparent 1px);
+    background-size: 24px 24px, 37px 37px;
+    background-position: 0 0, 12px 19px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    position: relative;
+    z-index: 1;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 36px 24px;
+    background: rgba(255,248,240,0.7);
+    border: 2px dashed #B8B0A8;
+    border-radius: 18px;
+    box-shadow: 3px 3px 0 rgba(184,176,168,0.25);
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: #5C5650;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  h1 .accent {
+    background: linear-gradient(to bottom, transparent 60%, #F2C94C 60%, #F2C94C 90%, transparent 90%);
+    padding: 0 4px;
+  }
+  .subtitle {
+    font-size: 1.25rem;
+    color: #8A7F75;
+    margin-bottom: 16px;
+  }
+  .meta {
+    font-size: 1rem;
+    color: #B8B0A8;
+  }
+
+  .intro {
+    background: #FFFDF7;
+    border: 1.5px solid #A8C5A0;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+    font-size: 1.15rem;
+    line-height: 1.9;
+    box-shadow: 2px 2px 0 rgba(168,197,160,0.25);
+  }
+  .intro strong { color: #6B8962; }
+
+  .episodes {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  .ep-card {
+    background: #FFFDF7;
+    border: 2px solid #F4A39C;
+    border-radius: 14px;
+    padding: 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 3px 3px 0 rgba(244,163,156,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ep-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 rgba(244,163,156,0.5);
+  }
+  .ep-card .num {
+    display: inline-block;
+    width: 38px; height: 38px;
+    background: #F2C94C;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 38px;
+    font-weight: 700;
+    color: #5C5650;
+    font-size: 1.2rem;
+  }
+  .ep-card h2 {
+    font-size: 1.4rem;
+    color: #5C5650;
+  }
+  .ep-card .ep-desc {
+    color: #8A7F75;
+    font-size: 1rem;
+  }
+  .ep-card .ep-panels {
+    color: #B8B0A8;
+    font-size: 0.95rem;
+    margin-top: auto;
+  }
+
+  .footer {
+    margin-top: 56px;
+    text-align: center;
+    color: #B8B0A8;
+    font-size: 1rem;
+    padding: 20px;
+  }
+  .footer a { color: #6B8962; text-decoration: none; border-bottom: 1.5px dashed #A8C5A0; }
+
+  .full-read {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 14px 28px;
+    background: #F4A39C;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 2px 2px 0 rgba(92,86,80,0.2);
+    transition: all 0.2s ease;
+  }
+  .full-read:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 rgba(92,86,80,0.3);
+  }
+
+  @media (max-width: 520px) {
+    .wrap { padding: 24px 12px 72px; }
+    header { padding: 24px 16px; }
+    .intro { padding: 18px 18px; font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>만화로 이해하는 <span class="accent">하네스</span></h1>
+    <p class="subtitle">— 일반인을 위한 AI 팀 운영 매뉴얼 입문 시리즈 —</p>
+    <p class="meta">5개 에피소드 · 26개 패널 · 2026-04-16</p>
+  </header>
+
+  <section class="intro">
+    <p>AI가 <strong>한 대 쓰는 시대</strong>에서 <strong>팀으로 엮는 시대</strong>로 바뀌고 있습니다. 하지만 우리 대부분의 머릿속은 아직 챗봇 한 대에 멈춰 있어요. 이 만화는 <strong>주방 브리게이드</strong> 비유로 "하네스"라는 낯선 개념을 자연스럽게 이해할 수 있도록 준비한 입문용 시리즈입니다.</p>
+    <p style="margin-top:12px;">주인공 Ana와 함께 팀 주방의 문을 열어보세요.</p>
+    <p style="text-align:center;margin-top:20px;">
+      <a class="full-read" href="all.html">전체 이어 읽기 →</a>
+    </p>
+  </section>
+
+  <div class="episodes">
+    <a class="ep-card" href="ep1.html">
+      <span class="num">1</span>
+      <h2>AI 하나에게 다 시키면?</h2>
+      <p class="ep-desc">혼자 코스 요리를 차리려는 셰프의 고군분투. 왜 AI 한 대로는 부족한지 감을 잡는 첫 화.</p>
+      <p class="ep-panels">5패널 · 개념: 분업의 힘</p>
+    </a>
+    <a class="ep-card" href="ep2.html">
+      <span class="num">2</span>
+      <h2>주방 브리게이드</h2>
+      <p class="ep-desc">팀 주방의 문이 열린다. 헤드셰프(오케스트레이터)와 에이전트 셰프들의 협업을 만난다.</p>
+      <p class="ep-panels">6패널 · 개념: 에이전트 · 오케스트레이터</p>
+    </a>
+    <a class="ep-card" href="ep3.html">
+      <span class="num">3</span>
+      <h2>레시피 카드와 운영 매뉴얼</h2>
+      <p class="ep-desc">스킬(레시피 카드)과 하네스(운영 매뉴얼)의 정체. 제품이 아니라 우리가 짜는 설계 방식.</p>
+      <p class="ep-panels">5패널 · 개념: 스킬 · 하네스</p>
+    </a>
+    <a class="ep-card" href="ep4.html">
+      <span class="num">4</span>
+      <h2>기억을 잃는 셰프</h2>
+      <p class="ep-desc">매일 출근하면 어제를 잊는 AI 셰프들. 메모리와 컨텍스트 윈도우가 왜 필요한지.</p>
+      <p class="ep-panels">5패널 · 개념: 컨텍스트 · 메모리</p>
+    </a>
+    <a class="ep-card" href="ep5.html">
+      <span class="num">5</span>
+      <h2>우리 일상의 하네스</h2>
+      <p class="ep-desc">김장 · 이사 · 소풍. 우리가 이미 살아가고 있는 하네스적 순간들.</p>
+      <p class="ep-panels">5패널 · 개념: 전이 · 종합</p>
+    </a>
+  </div>
+
+  <p class="footer">
+    손그림 doodle · 크림색 종이 · 파스텔 팔레트 · 색연필·마카 · <br>
+    황민호(revfactory@gmail.com) · <a href="../하네스_대중화_제안서.md">제안서 원문 보기</a>
+  </p>
+</div>
+</body>
+</html>
